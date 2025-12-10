@@ -1,0 +1,53 @@
+import React, { useEffect, useState } from 'react';
+import { ThemeConfig } from '../types';
+
+interface ThemeBackgroundProps {
+  theme: ThemeConfig;
+}
+
+const ThemeBackground: React.FC<ThemeBackgroundProps> = ({ theme }) => {
+  const [particles, setParticles] = useState<Array<{ id: number; left: number; top: number; delay: number; scale: number }>>([]);
+
+  useEffect(() => {
+    // Generate static particle positions on theme change to avoid constant re-renders causing jitter
+    const newParticles = Array.from({ length: 15 }).map((_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      delay: Math.random() * 5,
+      scale: 0.5 + Math.random() * 0.5,
+    }));
+    setParticles(newParticles);
+  }, [theme.id]);
+
+  return (
+    <div className={`fixed inset-0 -z-10 transition-colors duration-1000 ${theme.colors.background} overflow-hidden`}>
+      {/* Decorative Overlay Pattern */}
+      <div 
+        className={`absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] ${theme.visuals.bgPatternOpacity} mix-blend-overlay pointer-events-none`}
+      />
+
+      {/* Dynamic Particles */}
+      {particles.map((p) => (
+        <div
+          key={p.id}
+          className="absolute animate-float opacity-30 select-none pointer-events-none text-2xl filter blur-[1px]"
+          style={{
+            left: `${p.left}%`,
+            top: `${p.top}%`,
+            animationDelay: `${p.delay}s`,
+            transform: `scale(${p.scale})`,
+            color: 'rgba(255,255,255,0.3)' // Subtle white tint override for better blending
+          }}
+        >
+          {theme.visuals.particleEmoji}
+        </div>
+      ))}
+      
+      {/* Vignette */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none" />
+    </div>
+  );
+};
+
+export default ThemeBackground;
