@@ -1,0 +1,150 @@
+import React from 'react';
+import { FestivalType, ThemeConfig } from '../types';
+import { Users, IndianRupee, ArrowRight, Loader2 } from 'lucide-react';
+import { getIconComponent } from '../constants';
+
+interface DashboardProps {
+  theme: ThemeConfig;
+  selectedFestival: FestivalType;
+  familySize: number;
+  budget: number;
+  onFestivalChange: (f: FestivalType) => void;
+  onFamilySizeChange: (s: number) => void;
+  onBudgetChange: (b: number) => void;
+  onGenerate: () => void;
+  isLoading: boolean;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({
+  theme,
+  selectedFestival,
+  familySize,
+  budget,
+  onFestivalChange,
+  onFamilySizeChange,
+  onBudgetChange,
+  onGenerate,
+  isLoading
+}) => {
+  const MainIcon = getIconComponent(theme.icons.main);
+
+  return (
+    <div className="w-full max-w-4xl mx-auto p-6 md:p-8 flex flex-col justify-center min-h-[80vh]">
+      {/* Hero Section */}
+      <div className="text-center mb-12 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className={`inline-flex items-center justify-center p-6 rounded-full ${theme.colors.cardBg} backdrop-blur-md shadow-2xl border ${theme.colors.border} mb-6 ring-4 ring-white/10`}>
+          <MainIcon className={`w-16 h-16 ${theme.colors.primary} animate-float`} />
+        </div>
+        <h1 className={`text-5xl md:text-8xl font-serif font-bold ${theme.colors.textMain} drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] tracking-tight`}>
+          {theme.id === 'Default' ? 'Festival Prep' : `${theme.name} Ready`}
+        </h1>
+        <p className={`text-xl md:text-2xl ${theme.colors.textMuted} font-light max-w-2xl mx-auto leading-relaxed`}>
+          The ultimate intelligent companion for your grand Indian celebration.
+        </p>
+      </div>
+
+      {/* 3D Controls Card */}
+      <div className={`
+        relative overflow-hidden
+        ${theme.colors.cardBg} backdrop-blur-xl rounded-[2.5rem] p-8 md:p-12 shadow-2xl 
+        border ${theme.colors.border} transition-all duration-500
+        hover:shadow-[0_25px_60px_rgba(0,0,0,0.5)]
+        group
+      `}>
+        {/* Shine effect */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none" />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10">
+          
+          {/* Festival Selector */}
+          <div className="space-y-4">
+            <label className={`text-xs font-bold uppercase tracking-[0.2em] ${theme.colors.textMuted}`}>Celebration</label>
+            <div className="relative group/input">
+              <select 
+                value={selectedFestival}
+                onChange={(e) => onFestivalChange(e.target.value as FestivalType)}
+                className={`w-full appearance-none bg-black/20 ${theme.colors.textMain} border ${theme.colors.border} rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all cursor-pointer hover:bg-black/30 font-medium text-lg`}
+              >
+                <option value="Default" disabled>Select Festival</option>
+                <option value="Diwali" className="text-slate-900">Diwali 🪔</option>
+                <option value="Holi" className="text-slate-900">Holi 🎨</option>
+                <option value="Navratri" className="text-slate-900">Navratri 💃</option>
+                <option value="Eid" className="text-slate-900">Eid 🌙</option>
+                <option value="Christmas" className="text-slate-900">Christmas 🎄</option>
+              </select>
+              <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none ${theme.colors.textMuted}`}>▼</div>
+            </div>
+          </div>
+
+          {/* Family Size */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+               <label className={`text-xs font-bold uppercase tracking-[0.2em] ${theme.colors.textMuted}`}>Family</label>
+               <span className={`text-xs font-mono bg-white/10 px-2 py-1 rounded ${theme.colors.textMain}`}>{familySize} Members</span>
+            </div>
+            <div className={`flex items-center space-x-4 bg-black/20 rounded-2xl p-4 border ${theme.colors.border}`}>
+              <Users className={`w-6 h-6 ${theme.colors.secondary}`} />
+              <input 
+                type="range" 
+                min="1" 
+                max="20" 
+                value={familySize} 
+                onChange={(e) => onFamilySizeChange(Number(e.target.value))}
+                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-current opacity-80 hover:opacity-100 transition-opacity"
+                style={{ accentColor: theme.colors.accent.replace('bg-', 'var(--tw-color-)') }} 
+              />
+            </div>
+          </div>
+
+          {/* Budget */}
+          <div className="space-y-4">
+             <label className={`text-xs font-bold uppercase tracking-[0.2em] ${theme.colors.textMuted}`}>Budget</label>
+            <div className={`flex items-center space-x-3 bg-black/20 rounded-2xl px-6 py-4 border ${theme.colors.border} focus-within:bg-black/30 transition-all focus-within:ring-2 focus-within:ring-white/20`}>
+              <IndianRupee className={`w-6 h-6 ${theme.colors.secondary}`} />
+              <input 
+                type="number" 
+                value={budget} 
+                onChange={(e) => onBudgetChange(Number(e.target.value))}
+                className={`w-full bg-transparent ${theme.colors.textMain} focus:outline-none font-sans text-xl font-bold placeholder-white/20`}
+                placeholder="0"
+              />
+            </div>
+          </div>
+
+        </div>
+
+        {/* Generate Button */}
+        <div className="mt-12 flex justify-center">
+          <button 
+            onClick={onGenerate}
+            disabled={selectedFestival === 'Default' || isLoading}
+            className={`
+              group relative overflow-hidden rounded-2xl px-16 py-5
+              ${theme.colors.accent} ${selectedFestival === 'Holi' ? 'text-white' : 'text-slate-900'} 
+              font-bold text-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] transition-all duration-300 transform 
+              hover:scale-105 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] disabled:opacity-50 disabled:cursor-not-allowed
+              active:scale-95
+            `}
+          >
+             <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+            <span className="relative z-10 flex items-center space-x-3">
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <span>Curating Magic...</span>
+                </>
+              ) : (
+                <>
+                  <span>Begin Preparation</span>
+                  <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                </>
+              )}
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
